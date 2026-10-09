@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uma pergunta... ✨</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff5f7;
+      font-family: 'Nunito', sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(#ffd6e0 1.2px, transparent 1.2px);
+      background-size: 26px 26px;
+      opacity: 0.45;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 36px 32px 40px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 14px 40px rgba(255, 150, 170, 0.15),
+                  0 4px 14px rgba(255, 150, 170, 0.08);
+      border: 1.5px solid #ffe0e8;
+    }
+
+    .hello-kitty {
+      width: 90px;
+      height: auto;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 4px 8px rgba(255, 140, 160, 0.25));
+      animation: bounce 2.8s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+
+    h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.55rem;
+      font-weight: 500;
+      color: #5c3d4a;
+      line-height: 1.45;
+      margin-bottom: 32px;
+      letter-spacing: 0.01em;
+    }
+
+    .botoes {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+    }
+
+    button {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 13px 30px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    #btn-sim {
+      background: linear-gradient(135deg, #ff9aab, #ff7a92);
+      color: #fff;
+      box-shadow: 0 5px 18px rgba(255, 122, 146, 0.4);
+    }
+
+    #btn-sim:hover {
+      transform: scale(1.07);
+      box-shadow: 0 7px 22px rgba(255, 122, 146, 0.5);
+      background: linear-gradient(135deg, #ffa8b7, #ff8a9e);
+    }
+
+    #btn-sim:active {
+      transform: scale(0.96);
+    }
+
+    #btn-nao {
+      background: #fff0f3;
+      color: #c48a96;
+      border: 1.5px solid #ffd0da;
+      z-index: 999;
+    }
+
+    /* espaço invisível que segura o lugar do "Não" */
+    #nao-spacer {
+      flex-shrink: 0;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 245, 247, 0.88);
+      backdrop-filter: blur(7px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.28s ease, visibility 0.28s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: #ffffff;
+      border-radius: 26px;
+      padding: 36px 30px;
+      max-width: 340px;
+      width: 88%;
+      text-align: center;
+      box-shadow: 0 18px 45px rgba(255, 140, 160, 0.2);
+      border: 1.5px solid #ffe0e8;
+      transform: scale(0.88) translateY(14px);
+      transition: transform 0.32s cubic-bezier(0.34, 1.4, 0.64, 1);
+    }
+
+    .modal-overlay.active .modal {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-emoji {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .modal p {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #5c3d4a;
+      line-height: 1.55;
+      margin-bottom: 26px;
+    }
+
+    .modal-close {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(135deg, #ff9aab, #ff7a92);
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(255, 122, 146, 0.35);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .modal-close:hover {
+      transform: scale(1.06);
+      box-shadow: 0 6px 18px rgba(255, 122, 146, 0.45);
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 1.35rem; }
+      .hello-kitty { width: 78px; }
+      button { padding: 12px 24px; font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <svg class="hello-kitty" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="32" cy="28" rx="18" ry="22" fill="#fff"/>
+      <ellipse cx="88" cy="28" rx="18" ry="22" fill="#fff"/>
+      <ellipse cx="32" cy="30" rx="10" ry="13" fill="#ff9aab"/>
+      <ellipse cx="88" cy="30" rx="10" ry="13" fill="#ff9aab"/>
+      <circle cx="60" cy="62" r="42" fill="#fff" stroke="#f5d0d8" stroke-width="1.5"/>
+      <ellipse cx="82" cy="28" rx="16" ry="11" fill="#ff5c7a" transform="rotate(-18 82 28)"/>
+      <ellipse cx="98" cy="32" rx="14" ry="10" fill="#ff5c7a" transform="rotate(22 98 32)"/>
+      <circle cx="90" cy="30" r="7" fill="#ff3d5e"/>
+      <ellipse cx="44" cy="60" rx="5.5" ry="7" fill="#3d2c2e"/>
+      <ellipse cx="76" cy="60" rx="5.5" ry="7" fill="#3d2c2e"/>
+      <ellipse cx="60" cy="72" rx="4" ry="3" fill="#ff9aab"/>
+      <line x1="18" y1="68" x2="38" y2="70" stroke="#d4a0a8" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="16" y1="76" x2="38" y2="76" stroke="#d4a0a8" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="18" y1="84" x2="38" y2="82" stroke="#d4a0a8" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="102" y1="68" x2="82" y2="70" stroke="#d4a0a8" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="104" y1="76" x2="82" y2="76" stroke="#d4a0a8" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="102" y1="84" x2="82" y2="82" stroke="#d4a0a8" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+
+    <h1>Quer sair sexta? 🥳</h1>
+
+    <div class="botoes">
+      <button id="btn-sim">Sim</button>
+      <button id="btn-nao">Não</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <span class="modal-emoji">💕</span>
+      <p>Fechou! Sexta eu te chamo<br>pra gente combinar ✨</p>
+      <button class="modal-close" id="modalClose">Ok 🎀</button>
+    </div>
+  </div>
+
+  <script>
+    const btnNao = document.getElementById('btn-nao');
+    const btnSim = document.getElementById('btn-sim');
+    const modal = document.getElementById('modal');
+    const modalClose = document.getElementById('modalClose');
+    const botoes = document.querySelector('.botoes');
+
+    function alinharBotaoNao() {
+      // Garante que o botão está no fluxo normal
+      btnNao.style.position = 'static';
+      btnNao.style.left = '';
+      btnNao.style.top = '';
+
+      // Pega a posição real (já centralizada pelo flex)
+      const rect = btnNao.getBoundingClientRect();
+
+      // Cria (ou atualiza) o espaço invisível pra não deixar o Sim se mexer
+      let spacer = document.getElementById('nao-spacer');
+      if (!spacer) {
+        spacer = document.createElement('div');
+        spacer.id = 'nao-spacer';
+        botoes.appendChild(spacer);
+      }
+      spacer.style.width = btnNao.offsetWidth + 'px';
+      spacer.style.height = btnNao.offsetHeight + 'px';
+
+      // Agora transforma o Não em fixed na posição certinha
+      btnNao.style.position = 'fixed';
+      btnNao.style.left = rect.left + 'px';
+      btnNao.style.top = rect.top + 'px';
+    }
+
+    window.addEventListener('load', alinharBotaoNao);
+    window.addEventListener('resize', alinharBotaoNao);
+
+    function foge() {
+      const btnW = btnNao.offsetWidth;
+      const btnH = btnNao.offsetHeight;
+      const maxX = window.innerWidth - btnW;
+      const maxY = window.innerHeight - btnH;
+
+      const novoX = Math.random() * maxX;
+      const novoY = Math.random() * maxY;
+
+      btnNao.style.left = novoX + 'px';
+      btnNao.style.top = novoY + 'px';
+    }
+
+    btnNao.addEventListener('mouseover', foge);
+
+    btnNao.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      foge();
+    });
+
+    btnNao.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      foge();
+    }, { passive: false });
+
+    btnSim.addEventListener('click', () => {
+      modal.classList.add('active');
+    });
+
+    modalClose.addEventListener('click', () => {
+      modal.classList.remove('active');
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>
