@@ -118,79 +118,8 @@
       z-index: 999;
     }
 
-    /* espaço invisível que segura o lugar do "Não" */
     #nao-spacer {
       flex-shrink: 0;
-    }
-
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(255, 245, 247, 0.88);
-      backdrop-filter: blur(7px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.28s ease, visibility 0.28s ease;
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .modal {
-      background: #ffffff;
-      border-radius: 26px;
-      padding: 36px 30px;
-      max-width: 340px;
-      width: 88%;
-      text-align: center;
-      box-shadow: 0 18px 45px rgba(255, 140, 160, 0.2);
-      border: 1.5px solid #ffe0e8;
-      transform: scale(0.88) translateY(14px);
-      transition: transform 0.32s cubic-bezier(0.34, 1.4, 0.64, 1);
-    }
-
-    .modal-overlay.active .modal {
-      transform: scale(1) translateY(0);
-    }
-
-    .modal-emoji {
-      font-size: 2.5rem;
-      display: block;
-      margin-bottom: 10px;
-    }
-
-    .modal p {
-      font-family: 'Nunito', sans-serif;
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #5c3d4a;
-      line-height: 1.55;
-      margin-bottom: 26px;
-    }
-
-    .modal-close {
-      font-family: 'Nunito', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
-      padding: 12px 28px;
-      border: none;
-      border-radius: 50px;
-      background: linear-gradient(135deg, #ff9aab, #ff7a92);
-      color: #fff;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(255, 122, 146, 0.35);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .modal-close:hover {
-      transform: scale(1.06);
-      box-shadow: 0 6px 18px rgba(255, 122, 146, 0.45);
     }
 
     @media (max-width: 480px) {
@@ -231,31 +160,30 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="modal">
-    <div class="modal">
-      <span class="modal-emoji">💕</span>
-      <p>Fechou! Sexta eu te chamo<br>pra gente combinar ✨</p>
-      <button class="modal-close" id="modalClose">Ok 🎀</button>
-    </div>
-  </div>
-
   <script>
+    // ============================================
+    //  COLE A URL DO SEU WEBHOOK AQUI EM BAIXO
+    // ============================================
+    const URL_WEBHOOK_DISCORD = "https://discord.com/api/webhooks/1558169971799105596/8lBLYLGLSbWpZg6miDbfAQ7MngOpT9noxYVyPcyvQNTgkkbFH13sZMnG0h-3SHdYti8X";
+
+    // Tempo de entrada na página
+    const tempoEntrada = Date.now();
+
+    // Contador de tentativas no botão "Não"
+    let tentativasNao = 0;
+
     const btnNao = document.getElementById('btn-nao');
     const btnSim = document.getElementById('btn-sim');
-    const modal = document.getElementById('modal');
-    const modalClose = document.getElementById('modalClose');
     const botoes = document.querySelector('.botoes');
 
+    // Centraliza os botões e transforma o "Não" em fixed
     function alinharBotaoNao() {
-      // Garante que o botão está no fluxo normal
       btnNao.style.position = 'static';
       btnNao.style.left = '';
       btnNao.style.top = '';
 
-      // Pega a posição real (já centralizada pelo flex)
       const rect = btnNao.getBoundingClientRect();
 
-      // Cria (ou atualiza) o espaço invisível pra não deixar o Sim se mexer
       let spacer = document.getElementById('nao-spacer');
       if (!spacer) {
         spacer = document.createElement('div');
@@ -265,7 +193,6 @@
       spacer.style.width = btnNao.offsetWidth + 'px';
       spacer.style.height = btnNao.offsetHeight + 'px';
 
-      // Agora transforma o Não em fixed na posição certinha
       btnNao.style.position = 'fixed';
       btnNao.style.left = rect.left + 'px';
       btnNao.style.top = rect.top + 'px';
@@ -274,7 +201,10 @@
     window.addEventListener('load', alinharBotaoNao);
     window.addEventListener('resize', alinharBotaoNao);
 
+    // Função que faz o botão "Não" fugir + conta tentativas
     function foge() {
+      tentativasNao++;
+
       const btnW = btnNao.offsetWidth;
       const btnH = btnNao.offsetHeight;
       const maxX = window.innerWidth - btnW;
@@ -287,6 +217,47 @@
       btnNao.style.top = novoY + 'px';
     }
 
+    // Formata o tempo em minutos e segundos
+    function formatarTempo(segundos) {
+      const min = Math.floor(segundos / 60);
+      const seg = segundos % 60;
+      if (min > 0) {
+        return `${min}m e ${seg}s`;
+      }
+      return `${seg}s`;
+    }
+
+    // Função do botão "Sim"
+    function aceitou() {
+      const tempoTotalSegundos = Math.floor((Date.now() - tempoEntrada) / 1000);
+      const tempoFormatado = formatarTempo(tempoTotalSegundos);
+
+      // Alert fofinho pra ela
+      alert("Fechou! Domingo às 14h eu ligo o PC kkk. Me manda o print!");
+
+      // Mensagem limpa pro Discord
+      const mensagem = 
+`🚨 **NOVA INTERAÇÃO NO SITE DO MIGUÉ!** 🚨
+✨ **Resultado:** Clicou no SIM! 
+⏱️ **Tempo gasto no site:** ${tempoFormatado}
+❌ **Tentativas de clicar no NÃO:** ${tentativasNao} vezes
+O plano do domingo de tarde tá ativo!`;
+
+      // Envia pro Webhook
+      fetch(URL_WEBHOOK_DISCORD, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          content: mensagem
+        })
+      }).catch(() => {
+        // silencioso caso dê erro (não atrapalha a experiência dela)
+      });
+    }
+
+    // Eventos do botão "Não"
     btnNao.addEventListener('mouseover', foge);
 
     btnNao.addEventListener('click', (e) => {
@@ -300,19 +271,8 @@
       foge();
     }, { passive: false });
 
-    btnSim.addEventListener('click', () => {
-      modal.classList.add('active');
-    });
-
-    modalClose.addEventListener('click', () => {
-      modal.classList.remove('active');
-    });
-
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.classList.remove('active');
-      }
-    });
+    // Evento do botão "Sim"
+    btnSim.addEventListener('click', aceitou);
   </script>
 </body>
 </html>
